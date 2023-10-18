@@ -1,17 +1,21 @@
 const express = require("express");
+const connectDatabase = require("./config/Databse");
+const dotenv= require("dotenv")
+dotenv.config({path:"./config/config.env"})
 const app = express();
-const fs = require("fs");
-const path = require("path");
-const port = 5000;
+const tourRouter = require("./routes/tourRoutes");
+const userRouter = require("./routes/userRoutes")
 
-const toursPath = path.join(__dirname, "dev-data", "data", "tours-simple.json");
-const tours = JSON.parse(fs.readFileSync(toursPath));
 
-app.get("/tours", (req, res) => res.status(200).json({
-    status:"success",
-    results:tours.length,
-    data:{
-        tours
-    }
-}));
+// Middleware to parse JSON data
+app.use(express.json())
+app.use(express.static("./public"))
+
+
+app.use("/api/tours",tourRouter)
+app.use("/api/users",userRouter)
+
+connectDatabase();
+
+const port =process.env.PORT || 5000;
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
